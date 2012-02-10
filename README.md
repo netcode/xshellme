@@ -9,10 +9,14 @@ XShellMe published under MIT License <http://www.opensource.org/licenses/mit-lic
 Usage
 -------
 
-1- upload the script to your root directory usually public_html
-2- run it by call the script via browser or via terminal
+* upload the script to your root directory usually public_html
+* run it by call the script via browser or via terminal:
+
 	php xshell.php
 
 * you can change the scan specified directory by modify xshell.php like that: 
+
 	$xshell = new xShellMe();
 	$xshell->start('myFolder');
+	
+
