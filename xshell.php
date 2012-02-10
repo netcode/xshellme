@@ -10,11 +10,14 @@ class xShellMe {
 	
 	public $checkTypes = array('php','php3','php4','asp','aspx','sh','py');
 	private $_pattern = '%(passthru|shell_exec|exec|base64_decode|eval|system|proc_open|popen|curl_exec|curl_multi_exec|parse_ini_file|show_source)%'; //system: regex for detect Suspicious behavior
+	/* TODO: seperate patterns to levels so you can check files and define infecttion level
 	private $_pattern_level = array(
 		'1'=> '', // high risk
 		'2'=>'', // medium risk
 		'3'=>'' // low risk
 	);
+	 */
+	private $result = array();
 	
 	/*
 	 * 
@@ -29,19 +32,18 @@ class xShellMe {
 	/*
 	 * 
 	 */
-	function start(){
-		$sitepath = realpath(dirname(__FILE__));	
-		echo $sitepath;
-		//exit();
-		$current = './';
+	function start($current = './'){
+		echo '<h2>Result</h2>';
 		$this->goDeep($current);
+		echo '<hr />';
+		echo '<h2>Details:</h2>';
+		echo '<pre>';print_r($this->result);echo '</pre>';
 	}
 	
 	/*
 	 * 
 	 */
 	function goDeep($folder){
-		//echo 'i am in folder::'.$folder.'<br />';
 		$contents = scandir($folder);
 		foreach($contents as $content){
 			if($content == '.' || $content == '..'){
@@ -49,13 +51,11 @@ class xShellMe {
 			}elseif(is_dir($folder.$content)){
 				$this->goDeep($folder.$content.'/');
 			}else{
-				if($content == 'xshell.php' && $folder = './'){ //must recheack
+				if($content == 'xshell.php' && $folder == './'){ //must recheck
 					continue;
 				}
-				//echo 'i am file :)'.'<br />';
 				if($this->check($folder.$content)){
-					echo 'i am in folder::'.$folder.'<br />';
-					echo '<p style="color:red;"> Ya Lahwy: '.$folder.$content.'</p>';
+					echo '<p style="color:red;"> Found Shell: '.$folder.$content.'</p>';
 				}else{
 					//echo '<p style="color:green;"> Good: '.$folder.$content.'</p>';
 				}
@@ -94,7 +94,7 @@ class xShellMe {
 		$content = file_get_contents($file);
 		//echo $content;
         if(preg_match_all($this->_pattern, $content, $matches)) {
-        	print_r($matches);
+        	$this->result[$file] = $matches[0];
         	return true;	
 		}else{
 			return false;
